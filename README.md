@@ -6,7 +6,7 @@ Author: Streltsov Sergey (mailto:straltsou.siarhei@gmail.com, http://blablasoft.
 
 License: MIT
 
-Version: 0.0.3 from 2018.04.04
+Version: 0.0.4 from 2020.12.17
 
 Socket name length = 11 char
 

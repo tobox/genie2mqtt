@@ -4,7 +4,6 @@
 # Copyright: (c) 2017, Streltsov Sergey
 # Author: Streltsov Sergey (mailto:straltsou.siarhei@gmail.com, http://blablasoft.ru)
 # License: MIT
-# Version: 0.0.99 from 2017.08.20
 # Socket name length = 11 char
 """
 The library to toggle Energenie smart sockets.
@@ -46,7 +45,7 @@ class Energenie(object):
                 Status code for login operation
         """
         try:
-            request = requests.post(self.ip + '/login.html', 'pw=' + self._passwd, timeout=5)
+            request = requests.post(self.ip + '/login.html', data = {'pw': self._passwd}, timeout=5)
             status_code = request.status_code
         except:
             status_code = -1
@@ -156,7 +155,7 @@ class Energenie(object):
         self._logout()
         if (self._login() == 200) and self._validate_socket(socket):
             for i in socket:
-                request = requests.post(self.ip, 'cte' + str(i) + '=' + str(command))
+                request = requests.post(self.ip, data = {'cte' + str(i) : str(command) })
         else:
             self.online = False
         self._logout()

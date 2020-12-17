@@ -32,10 +32,10 @@ LOG_FILE = '/var/log/genie2mqtt.log' # path to log-file
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         client.connected_flag = True
-        client.subscribe('energenie/socket1/state/', 0)
-        client.subscribe('energenie/socket2/state/', 0)
-        client.subscribe('energenie/socket3/state/', 0)
-        client.subscribe('energenie/socket4/state/', 0)
+        client.subscribe('energenie/socket1/cmnd', 0)
+        client.subscribe('energenie/socket2/cmnd', 0)
+        client.subscribe('energenie/socket3/cmnd', 0)
+        client.subscribe('energenie/socket4/cmnd', 0)
         client.energenie_logger.info('Connection established with code: {}'.format(rc))
     else:
         client.energenie_logger.info('Connection code: {}'.format(rc))
@@ -44,9 +44,14 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    client.energenie_socket.toggle_pm(command=str(int(msg.payload)), socket=str(msg.topic[-8]))
+    # this is an ugly hack. We get the socket number from a fixed offset in the mqtt topic
+    client.energenie_socket.toggle_pm(command=str(int(msg.payload)), socket=str(msg.topic[-6]))
     client.energenie_logger.info('message: {}'.format(msg.payload))
     client.energenie_socket.update(False)
+    client.publish('energenie/socket1/state', str(client.energenie_socket.socket1['state']), 0)
+    client.publish('energenie/socket2/state', str(client.energenie_socket.socket2['state']), 0)
+    client.publish('energenie/socket3/state', str(client.energenie_socket.socket3['state']), 0)
+    client.publish('energenie/socket4/state', str(client.energenie_socket.socket4['state']), 0)
 
 
 def renew(client):
@@ -54,20 +59,20 @@ def renew(client):
         isAvailable = 'online'
     else:
         isAvailable = 'offline'
-    client.publish('energenie/name/', client.energenie_socket.name, 0)
-    client.publish('energenie/ip/', client.energenie_socket.ip, 0)
-    client.publish('energenie/mac/', client.energenie_socket.mac, 0)
-    client.publish('energenie/online/', isAvailable, 0)
-    client.publish('energenie/dhcp/', client.energenie_socket.dhcp, 0)
-    client.publish('energenie/updated/', client.energenie_socket.updated, 0)
-    client.publish('energenie/socket1/name/', client.energenie_socket.socket1['name'], 0)
-    client.publish('energenie/socket2/name/', client.energenie_socket.socket2['name'], 0)
-    client.publish('energenie/socket3/name/', client.energenie_socket.socket3['name'], 0)
-    client.publish('energenie/socket4/name/', client.energenie_socket.socket4['name'], 0)
-    client.publish('energenie/socket1/state/', str(client.energenie_socket.socket1['state']), 0)
-    client.publish('energenie/socket2/state/', str(client.energenie_socket.socket2['state']), 0)
-    client.publish('energenie/socket3/state/', str(client.energenie_socket.socket3['state']), 0)
-    client.publish('energenie/socket4/state/', str(client.energenie_socket.socket4['state']), 0)
+    client.publish('energenie/name', client.energenie_socket.name, 0)
+    client.publish('energenie/ip', client.energenie_socket.ip, 0)
+    client.publish('energenie/mac', client.energenie_socket.mac, 0)
+    client.publish('energenie/online', isAvailable, 0)
+    client.publish('energenie/dhcp', client.energenie_socket.dhcp, 0)
+    client.publish('energenie/updated', client.energenie_socket.updated, 0)
+    client.publish('energenie/socket1/name', client.energenie_socket.socket1['name'], 0)
+    client.publish('energenie/socket2/name', client.energenie_socket.socket2['name'], 0)
+    client.publish('energenie/socket3/name', client.energenie_socket.socket3['name'], 0)
+    client.publish('energenie/socket4/name', client.energenie_socket.socket4['name'], 0)
+    client.publish('energenie/socket1/state', str(client.energenie_socket.socket1['state']), 0)
+    client.publish('energenie/socket2/state', str(client.energenie_socket.socket2['state']), 0)
+    client.publish('energenie/socket3/state', str(client.energenie_socket.socket3['state']), 0)
+    client.publish('energenie/socket4/state', str(client.energenie_socket.socket4['state']), 0)
     client.energenie_logger.info('Socket is: {}'.format(isAvailable))
 
 
